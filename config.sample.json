@@ -1,0 +1,13 @@
+{
+  "name": "Example Game",
+  "gameDir": "%ProgramFiles(x86)%\Steam\steamapps\common\Example Game",
+  "backupDir": "%USERPROFILE%\Backups\Example Game",
+  "processNames": ["ExampleGame"],
+  "versionFile": "bin\ExampleGame.exe",
+  "areas": {
+    "scripts": "mods\scripts",
+    "plugins": "bin\plugins"
+  },
+  "rootFiles": ["*.ini"],
+  "logFile": "%LOCALAPPDATA%\ModToolkit\example-game.log"
+}

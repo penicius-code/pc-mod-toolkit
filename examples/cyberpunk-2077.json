@@ -1,0 +1,17 @@
+{
+  "name": "Cyberpunk 2077",
+  "gameDir": "%ProgramFiles(x86)%\Steam\steamapps\common\Cyberpunk 2077",
+  "backupDir": "%USERPROFILE%\Backups\Cyberpunk 2077",
+  "processNames": ["Cyberpunk2077"],
+  "versionFile": "bin\x64\Cyberpunk2077.exe",
+  "areas": {
+    "bin": "bin\x64",
+    "r6": "r6",
+    "red4ext": "red4ext",
+    "archive-mods": "archive\pc\mod",
+    "redmod": "mods",
+    "engine-tools": "engine\tools"
+  },
+  "rootFiles": [],
+  "logFile": "%LOCALAPPDATA%\ModToolkit\cyberpunk-2077.log"
+}

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  powershell:
+    name: PowerShell lint (PSScriptAnalyzer)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $r = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error,Warning
+          $r | Format-Table -AutoSize
+          if ($r | Where-Object Severity -eq 'Error') { exit 1 }
+
+  python:
+    name: Python check (ruff, syntax errors and undefined names)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install ruff
+      - run: ruff check --select E9,F63,F7,F82 .
+
+  tests:
+    name: Pester tests on a mock game folder
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PowerShell 7
+        shell: pwsh
+        run: |
+          if (-not (Get-Module -ListAvailable Pester | Where-Object { $_.Version.Major -ge 5 })) { Install-Module Pester -MinimumVersion 5.0 -Force -SkipPublisherCheck -Scope CurrentUser }
+          Import-Module Pester -MinimumVersion 5.0
+          $r = Invoke-Pester -Path tests -PassThru -Output Detailed
+          if ($r.FailedCount -gt 0 -or $r.PassedCount -eq 0) { exit 1 }
+      - name: Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          if (-not (Get-Module -ListAvailable Pester | Where-Object { $_.Version.Major -ge 5 })) { Install-Module Pester -MinimumVersion 5.0 -Force -SkipPublisherCheck -Scope CurrentUser }
+          Import-Module Pester -MinimumVersion 5.0
+          $r = Invoke-Pester -Path tests -PassThru -Output Detailed
+          if ($r.FailedCount -gt 0 -or $r.PassedCount -eq 0) { exit 1 }
